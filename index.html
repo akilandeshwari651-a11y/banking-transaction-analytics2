@@ -1,0 +1,613 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankSight - Banking Analytics</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f5fa;
+            color: #17233b;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #101d35;
+            color: white;
+            position: fixed;
+            padding: 25px 18px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 45px;
+            color: #75a0ff;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            margin: 8px 0;
+            color: #aebbd0;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #293d60;
+            color: white;
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .topbar h2 {
+            font-size: 25px;
+        }
+
+        .admin {
+            color: #66738a;
+        }
+
+        .subtitle {
+            color: #8994a7;
+            margin-top: 8px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin: 25px 0;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #dce1eb;
+        }
+
+        .card h4 {
+            color: #8792a7;
+            font-size: 13px;
+        }
+
+        .card h2 {
+            margin-top: 15px;
+            font-size: 26px;
+        }
+
+        .blue { color: #4778ee; }
+        .green { color: #20b88a; }
+        .purple { color: #8b6de9; }
+        .orange { color: #ed9c45; }
+
+        .section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #dce1eb;
+        }
+
+        .panel h3 {
+            margin-bottom: 18px;
+        }
+
+        .chart-container {
+            height: 280px;
+        }
+
+        .transactions {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin-bottom: 25px;
+        }
+
+        .transactions h3 {
+            margin-bottom: 20px;
+        }
+
+        .search {
+            padding: 10px;
+            width: 280px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        th {
+            color: #8994a7;
+            background: #f8f9fc;
+        }
+
+        .success {
+            color: #20a77e;
+            font-weight: bold;
+        }
+
+        .failed {
+            color: #e28d43;
+            font-weight: bold;
+        }
+
+        .badge {
+            background: #e8f8f1;
+            padding: 5px 9px;
+            border-radius: 15px;
+        }
+
+        .failed-badge {
+            background: #fff1e4;
+            padding: 5px 9px;
+            border-radius: 15px;
+        }
+
+        .channel {
+            margin: 18px 0;
+        }
+
+        .bar {
+            height: 9px;
+            background: #e9edf5;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+
+        .bar span {
+            display: block;
+            height: 100%;
+            background: #6388ef;
+            border-radius: 10px;
+        }
+
+        .review {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .review p {
+            margin-top: 12px;
+            color: #77839a;
+            font-size: 13px;
+        }
+
+        button {
+            background: #4778ee;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #315fce;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #8994a7;
+            font-size: 12px;
+        }
+
+        @media(max-width: 1000px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .sidebar a {
+                display: inline-block;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 18px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .section {
+                grid-template-columns: 1fr;
+            }
+
+            .search {
+                width: 100%;
+            }
+        }
+
+        @media(max-width: 400px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo">BankSight</div>
+
+        <a href="#dashboard" class="active">▦ Dashboard</a>
+        <a href="#transactions">⇄ Transactions</a>
+        <a href="#analytics">▤ Analytics</a>
+        <a href="#channels">◉ Payment Channels</a>
+        <a href="#review">⚠ Review Queue</a>
+    </div>
+
+    <div class="main">
+
+        <div class="topbar" id="dashboard">
+            <div>
+                <h2>Banking Analytics Dashboard</h2>
+                <p class="subtitle">
+                    Monitor and analyse banking transactions
+                </p>
+            </div>
+
+            <div class="admin">Admin | Demo Account</div>
+        </div>
+
+        <div class="cards">
+
+            <div class="card">
+                <h4>Total Transactions</h4>
+                <h2 class="blue">1,284</h2>
+            </div>
+
+            <div class="card">
+                <h4>Total Transaction Value</h4>
+                <h2 class="purple">₹84.62L</h2>
+            </div>
+
+            <div class="card">
+                <h4>Successful Transactions</h4>
+                <h2 class="green">96.2%</h2>
+            </div>
+
+            <div class="card">
+                <h4>Flagged for Review</h4>
+                <h2 class="orange">06</h2>
+            </div>
+
+        </div>
+
+        <div class="section" id="analytics">
+
+            <div class="panel">
+                <h3>Monthly Transaction Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="transactionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Transaction Status</h3>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section" id="channels">
+
+            <div class="panel">
+                <h3>Payment Channel Analysis</h3>
+
+                <div class="channel">
+                    UPI - 48%
+                    <div class="bar">
+                        <span style="width:48%"></span>
+                    </div>
+                </div>
+
+                <div class="channel">
+                    Debit / Credit Card - 25%
+                    <div class="bar">
+                        <span style="width:25%"></span>
+                    </div>
+                </div>
+
+                <div class="channel">
+                    Net Banking - 16%
+                    <div class="bar">
+                        <span style="width:16%"></span>
+                    </div>
+                </div>
+
+                <div class="channel">
+                    ATM - 8%
+                    <div class="bar">
+                        <span style="width:8%"></span>
+                    </div>
+                </div>
+
+                <div class="channel">
+                    Branch - 3%
+                    <div class="bar">
+                        <span style="width:3%"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Banking Insights</h3>
+
+                <p>✓ UPI is the most frequently used payment channel.</p>
+                <br>
+
+                <p>✓ Monthly transaction activity is available for analysis.</p>
+                <br>
+
+                <p>✓ High-value transactions can be sent for manual review.</p>
+                <br>
+
+                <p>✓ Debit and credit patterns help understand customer behaviour.</p>
+            </div>
+
+        </div>
+
+        <div class="transactions" id="transactions">
+
+            <h3>Recent Transactions</h3>
+
+            <input
+                type="text"
+                class="search"
+                id="searchInput"
+                placeholder="Search transaction or customer ID..."
+            >
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Customer ID</th>
+                        <th>Channel</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="transactionTable">
+
+                    <tr>
+                        <td>TXN00498</td>
+                        <td>CUST008</td>
+                        <td>UPI</td>
+                        <td>Debit</td>
+                        <td>₹2,450</td>
+                        <td class="success">SUCCESS</td>
+                    </tr>
+
+                    <tr>
+                        <td>TXN00497</td>
+                        <td>CUST014</td>
+                        <td>Net Banking</td>
+                        <td>Credit</td>
+                        <td>₹18,500</td>
+                        <td class="success">SUCCESS</td>
+                    </tr>
+
+                    <tr>
+                        <td>TXN00496</td>
+                        <td>CUST021</td>
+                        <td>Card</td>
+                        <td>Debit</td>
+                        <td>₹7,290</td>
+                        <td class="success">SUCCESS</td>
+                    </tr>
+
+                    <tr>
+                        <td>TXN00495</td>
+                        <td>CUST003</td>
+                        <td>ATM</td>
+                        <td>Debit</td>
+                        <td>₹5,000</td>
+                        <td class="failed">FAILED</td>
+                    </tr>
+
+                    <tr>
+                        <td>TXN00494</td>
+                        <td>CUST019</td>
+                        <td>UPI</td>
+                        <td>Credit</td>
+                        <td>₹12,500</td>
+                        <td class="success">SUCCESS</td>
+                    </tr>
+
+                    <tr>
+                        <td>TXN00493</td>
+                        <td>CUST011</td>
+                        <td>Branch</td>
+                        <td>Debit</td>
+                        <td>₹62,000</td>
+                        <td class="success">SUCCESS</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="review" id="review">
+            <h3>Transaction Review Queue</h3>
+            <p>
+                TXN00493 - ₹62,000 | High-value review indicator
+            </p>
+            <p>
+                TXN00490 - ₹73,500 | High-value review indicator
+            </p>
+            <p>
+                These are sample threshold-based indicators, not confirmed fraud cases.
+            </p>
+        </div>
+
+        <footer>
+            © 2026 BankSight | Banking Transaction Analytics
+            <br><br>
+            Academic Project - Synthetic Demo Data
+        </footer>
+
+    </div>
+
+    <script>
+
+        // Monthly Transaction Chart
+
+        new Chart(
+            document.getElementById("transactionChart"),
+            {
+                type: "line",
+
+                data: {
+                    labels: ["August", "September", "October", "November"],
+
+                    datasets: [
+                        {
+                            label: "Debit",
+                            data: [420, 560, 480, 680],
+                            borderColor: "#4778ee",
+                            backgroundColor: "rgba(71,120,238,0.1)",
+                            fill: true,
+                            tension: 0.4
+                        },
+
+                        {
+                            label: "Credit",
+                            data: [280, 380, 340, 470],
+                            borderColor: "#8b6de9",
+                            backgroundColor: "rgba(139,109,233,0.1)",
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            }
+        );
+
+
+        // Transaction Status Chart
+
+        new Chart(
+            document.getElementById("statusChart"),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: ["Successful", "Failed"],
+
+                    datasets: [{
+                        data: [96.2, 3.8],
+                        backgroundColor: [
+                            "#20b88a",
+                            "#f2a64b"
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            }
+        );
+
+
+        // Transaction Search
+
+        document.getElementById("searchInput")
+        .addEventListener("keyup", function() {
+
+            let searchValue = this.value.toLowerCase();
+
+            let rows = document.querySelectorAll(
+                "#transactionTable tr"
+            );
+
+            rows.forEach(function(row) {
+
+                let rowText = row.innerText.toLowerCase();
+
+                row.style.display =
+                    rowText.includes(searchValue) ? "" : "none";
+
+            });
+
+        });
+
+    </script>
+
+</body>
+</html>
